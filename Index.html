@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root{--primary:#0ea5e9;--primary-dark:#0369a1;--nav:#0f172a;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0}
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}.hidden{display:none!important}
+    .login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px}.login-card{width:min(420px,100%);background:#fff;border-radius:18px;padding:28px;box-shadow:0 20px 50px #0f172a22}
+    .brand{font-size:24px;font-weight:800;margin-bottom:6px}.sub{color:var(--muted);margin-bottom:24px}label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+    input,select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:#fff}button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+    .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}.btn-success{background:#dcfce7;color:#166534}.btn-danger{background:#fee2e2;color:#991b1b}.btn-muted{background:#e2e8f0;color:#334155}.btn-dark{background:#0f172a;color:#fff}
+    .app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.sidebar{background:var(--nav);color:#fff;padding:22px 14px;position:sticky;top:0;height:100vh}.side-brand{font-size:19px;font-weight:800;padding:0 10px 18px}
+    .user-box{background:#ffffff12;border-radius:12px;padding:12px;margin:0 6px 14px;font-size:13px}.nav button{width:100%;text-align:left;background:transparent;color:#cbd5e1;margin:3px 0;padding:11px 12px}.nav button.active,.nav button:hover{background:#1e293b;color:#fff}
+    .main{padding:24px;overflow:auto}.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px}h1{font-size:24px;margin:0}h2{font-size:18px;margin:0 0 14px}.muted{color:var(--muted)}
+    .cards{display:grid;grid-template-columns:repeat(5,minmax(145px,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}.metric-label{font-size:12px;color:var(--muted);font-weight:700}.metric-value{font-size:23px;font-weight:800;margin-top:7px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.form-card{max-width:720px}.calc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.calc div{background:#f8fafc;border:1px solid var(--border);padding:12px;border-radius:10px}.calc small{display:block;color:var(--muted);margin-bottom:4px}.calc b{font-size:16px}
+    .table-wrap{overflow:auto;background:#fff;border:1px solid var(--border);border-radius:14px}table{border-collapse:collapse;width:100%;min-width:950px}th,td{padding:10px 11px;border-bottom:1px solid var(--border);text-align:left;font-size:13px;white-space:nowrap}th{background:#f8fafc;font-size:12px;position:sticky;top:0}
+    .status{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.s-lancar{background:#dcfce7;color:#166534}.s-terlambat{background:#fef3c7;color:#92400e}.s-macet{background:#fee2e2;color:#991b1b}.s-blacklist{background:#111827;color:#fff}.s-lunas{background:#dbeafe;color:#1d4ed8}
+    .actions{display:flex;gap:6px;flex-wrap:wrap}.toast{position:fixed;right:18px;bottom:18px;background:#0f172a;color:#fff;padding:12px 16px;border-radius:10px;z-index:99;box-shadow:0 12px 30px #0f172a33}.toast.error{background:#991b1b}.section{display:none}.section.active{display:block}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.empty{padding:30px;text-align:center;color:var(--muted)}.small{font-size:12px}.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px}
+    @media(max-width:1100px){.cards{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.nav{display:flex;gap:4px;overflow:auto}.nav button{width:auto;white-space:nowrap}.cards{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}}@media(max-width:560px){.main{padding:14px}.cards{grid-template-columns:1fr}.calc{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <div class="brand">Mingguan Ceria</div><div class="sub">Login Ketua Kelompok / admin</div>
+    <label>Username</label><input id="loginUsername" autocomplete="username">
+    <label>Password</label><input id="loginPassword" type="password" autocomplete="current-password">
+    <button class="btn-primary" style="width:100%;margin-top:18px" onclick="doLogin()">Masuk</button>
+    <div class="small muted" style="margin-top:14px">Transaksi yang sudah di-ACC terkunci. Blacklist hanya dapat diatur Admin.</div>
+  </div>
+</div>
+
+<div id="appView" class="app hidden">
+  <aside class="sidebar">
+    <div class="side-brand">Mingguan Ceria</div>
+    <div class="user-box"><b id="userName">-</b><br><span id="userRole">-</span></div>
+    <div class="nav">
+      <button data-page="dashboard" class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+      <button data-page="drop" onclick="showPage('drop',this)">Drop Baru</button>
+      <button data-page="payment" onclick="showPage('payment',this)">Input Angsuran</button>
+      <button data-page="report" onclick="showPage('report',this)">Laporan</button>
+      <button id="navRisk" data-page="risk" onclick="showPage('risk',this)">Risiko & Blacklist</button>
+      <button id="navApproval" data-page="approval" onclick="showPage('approval',this)">Menunggu ACC</button>
+      <button id="navUsers" data-page="users" onclick="showPage('users',this)">Karyawan</button>
+      <button id="navAudit" data-page="audit" onclick="showPage('audit',this)">Audit Log</button>
+      <button data-page="password" onclick="showPage('password',this)">Ubah Password</button>
+      <button onclick="doLogout()">Keluar</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="pageTitle">Dashboard</h1><div class="muted small">Bunga 20% flat • jatuh tempo mingguan • terlambat/macet otomatis • ACC terkunci</div></div>
+      <button class="btn-muted" onclick="refreshState()">↻ Refresh</button>
+    </div>
+
+    <section id="page-dashboard" class="section active">
+      <div id="dashboardCards" class="cards"></div>
+      <div class="card" style="margin-top:16px"><h2>Pinjaman Aktif</h2><div id="activeLoansTable"></div></div>
+    </section>
+
+    <section id="page-drop" class="section">
+      <div class="card form-card">
+        <h2>Input Drop Nasabah Baru</h2>
+        <div class="notice">Nomor HP dipakai sebagai salah satu identitas blacklist. Nasabah yang masih aktif di blacklist otomatis ditolak saat membuat drop baru.</div>
+        <label>Tanggal Drop</label><input id="dropDate" type="date">
+        <label>Nama Nasabah</label><input id="customerName" placeholder="Nama lengkap nasabah">
+        <label>No. HP / WhatsApp</label><input id="customerPhone" inputmode="numeric" placeholder="Contoh: 081234567890">
+        <label>Pokok Pinjaman</label><input id="principal" type="number" min="1" step="1000" placeholder="Contoh: 500000" oninput="updateDropCalc()">
+        <div class="calc"><div><small>Bunga 20%</small><b id="calcInterest">Rp0</b></div><div><small>Saldo Awal</small><b id="calcTotal">Rp0</b></div><div><small>Per Minggu</small><b id="calcWeekly">Rp0</b></div></div>
+        <button class="btn-primary" style="margin-top:16px" onclick="submitDropForm()">Simpan & Kirim ACC</button>
+      </div>
+    </section>
+
+    <section id="page-payment" class="section">
+      <div class="card form-card">
+        <h2>Input Pembayaran Angsuran</h2>
+        <label>Nasabah / Pinjaman</label><select id="paymentLoan" onchange="fillPaymentInfo()"></select>
+        <div id="paymentInfo" class="calc"></div>
+        <label>Tanggal Bayar</label><input id="paymentDate" type="date">
+        <label>Nominal Bayar</label><input id="paymentAmount" type="number" min="1" step="1000">
+        <button class="btn-primary" style="margin-top:16px" onclick="submitPaymentForm()">Simpan & Kirim ACC</button>
+      </div>
+    </section>
+
+    <section id="page-report" class="section">
+      <div class="toolbar"><div><h2 style="margin:0">Laporan Pinjaman</h2><div class="small muted">Status keterlambatan dihitung dari jatuh tempo masing-masing minggu.</div></div><button id="exportBtn" class="btn-dark" onclick="exportExcel()">Download Excel</button></div>
+      <div id="reportTable" class="table-wrap"></div>
+    </section>
+
+    <section id="page-risk" class="section">
+      <div class="notice" id="riskRule"></div>
+      <div class="grid-2"><div class="card"><h2>Nasabah Risiko</h2><div id="riskTable"></div></div><div class="card"><h2>Blacklist Aktif</h2><div id="blacklistTable"></div></div></div>
+    </section>
+
+    <section id="page-approval" class="section">
+      <div class="grid-2"><div class="card"><h2>Drop Menunggu ACC</h2><div id="pendingDrops"></div></div><div class="card"><h2>Angsuran Menunggu ACC</h2><div id="pendingPayments"></div></div></div>
+    </section>
+
+    <section id="page-users" class="section">
+      <div class="grid-2">
+        <div class="card"><h2>Tambah Karyawan</h2><label>Nama</label><input id="newUserName"><label>Username</label><input id="newUsername"><label>Password</label><input id="newUserPassword" type="password"><label>Role</label><select id="newUserRole"><option value="EMPLOYEE">Karyawan</option><option value="ADMIN">Admin</option></select><button class="btn-primary" style="margin-top:16px" onclick="addUser()">Buat Akun</button></div>
+        <div class="card"><h2>Daftar Akun</h2><div id="usersTable"></div></div>
+      </div>
+    </section>
+
+    <section id="page-audit" class="section"><div class="card"><h2>50 Aktivitas Terakhir</h2><div id="auditTable"></div></div></section>
+    <section id="page-password" class="section">
+  <div class="card form-card">
+
+    <h2>Ubah Password</h2>
+
+    <div class="small muted" style="margin-bottom:14px;">
+      Masukkan password lama dan password baru.
+    </div>
+
+    <label>Password Lama</label>
+    <input
+      id="currentPassword"
+      type="password"
+      autocomplete="current-password"
+    >
+
+    <label>Password Baru</label>
+    <input
+      id="newPassword"
+      type="password"
+      autocomplete="new-password"
+    >
+
+    <label>Ulangi Password Baru</label>
+    <input
+      id="confirmPassword"
+      type="password"
+      autocomplete="new-password"
+    >
+
+    <button
+      class="btn-primary"
+      style="margin-top:16px"
+      onclick="changePassword()"
+    >
+      Simpan Password Baru
+    </button>
+
+  </div>
+</section>
+  </main>
+</div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+let TOKEN=localStorage.getItem('pinjaman_token')||'';let STATE=null;
+document.addEventListener('DOMContentLoaded',()=>{const today=new Date().toISOString().slice(0,10);['dropDate','paymentDate'].forEach(id=>document.getElementById(id).value=today);if(TOKEN)refreshState(true)});
+function server(name,...args){return new Promise((resolve,reject)=>{google.script.run.withSuccessHandler(resolve).withFailureHandler(err=>reject(new Error(err&&err.message?err.message:String(err))))[name](...args)})}
+async function doLogin(){try{const r=await server('login',document.getElementById('loginUsername').value,document.getElementById('loginPassword').value);TOKEN=r.token;localStorage.setItem('pinjaman_token',TOKEN);await refreshState();toast('Login berhasil')}catch(e){toast(e.message,true)}}
+async function doLogout(){try{if(TOKEN)await server('logout',TOKEN)}catch(e){}TOKEN='';STATE=null;localStorage.removeItem('pinjaman_token');document.getElementById('appView').classList.add('hidden');document.getElementById('loginView').classList.remove('hidden')}
+async function changePassword() {
+
+  const currentPassword =
+    document.getElementById('currentPassword').value;
+
+  const newPassword =
+    document.getElementById('newPassword').value;
+
+  const confirmPassword =
+    document.getElementById('confirmPassword').value;
+
+  if (!currentPassword) {
+    toast('Password lama wajib diisi.', true);
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    toast('Password baru minimal 8 karakter.', true);
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    toast('Ulangi password baru tidak sama.', true);
+    return;
+  }
+
+  try {
+
+    const result = await server(
+      'changeOwnPassword',
+      TOKEN,
+      currentPassword,
+      newPassword
+    );
+
+    toast(result.message);
+
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+
+  } catch (e) {
+
+    toast(e.message, true);
+
+  }
+}
+async function refreshState(silent=false){try{STATE=await server('getAppState',TOKEN);document.getElementById('loginView').classList.add('hidden');document.getElementById('appView').classList.remove('hidden');document.getElementById('userName').textContent=STATE.session.name;document.getElementById('userRole').textContent=STATE.session.role==='ADMIN'?'ADMIN / PEMILIK':'KARYAWAN';const admin=STATE.session.role==='ADMIN';['navRisk','navApproval','navUsers','navAudit'].forEach(id=>document.getElementById(id).classList.toggle('hidden',!admin));document.getElementById('exportBtn').classList.toggle('hidden',!admin);renderAll();if(!silent)toast('Data diperbarui')}catch(e){if(String(e.message).toLowerCase().includes('sesi')){TOKEN='';localStorage.removeItem('pinjaman_token');document.getElementById('appView').classList.add('hidden');document.getElementById('loginView').classList.remove('hidden')}if(!silent)toast(e.message,true)}}
+function renderAll(){renderDashboard();renderPaymentLoans();renderReport();if(STATE.session.role==='ADMIN'){renderRisk();renderApprovals();renderUsers();renderAudit()}}
+function renderDashboard(){const d=STATE.dashboard;const cards=[['Total Nasabah',d.customers],['Total Pokok',rp(d.totalPrincipal)],['Total Tagihan',rp(d.totalReceivable)],['Angsuran Masuk',rp(d.totalPaid)],['Saldo Piutang',rp(d.totalBalance)],['Nasabah Aktif',d.activeCount],['Terlambat',d.overdueCount],['Macet',d.badDebtCount],['Blacklist',d.blacklistCount],['Menunggu ACC',(d.pendingDropCount+d.pendingPaymentCount)]];document.getElementById('dashboardCards').innerHTML=cards.map(x=>`<div class="card"><div class="metric-label">${esc(x[0])}</div><div class="metric-value">${esc(String(x[1]))}</div></div>`).join('');const rows=STATE.activeLoans.map(l=>`<tr><td>${esc(l.customerName)}<br><span class="small muted">${esc(l.phone||'-')}</span></td><td>${fmtDate(l.dropDate)}</td><td>${rp(l.balance)}</td><td>${l.nextWeek?'Minggu '+l.nextWeek:'-'}</td><td>${l.nextDueDate?fmtDate(l.nextDueDate):'-'}</td><td>${l.daysLate||0} hari</td><td>${riskBadge(l.collectionStatus,l.blacklisted)}</td></tr>`).join('');document.getElementById('activeLoansTable').innerHTML=STATE.activeLoans.length?`<div class="table-wrap"><table><thead><tr><th>Nasabah</th><th>Tgl Drop</th><th>Saldo</th><th>Angsuran</th><th>Jatuh Tempo</th><th>Terlambat</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<div class="empty">Belum ada pinjaman aktif.</div>`}
+function updateDropCalc(){const p=Number(document.getElementById('principal').value||0),bunga=Math.round(p*.20),total=p+bunga,weekly=Math.round(total/6);document.getElementById('calcInterest').textContent=rp(bunga);document.getElementById('calcTotal').textContent=rp(total);document.getElementById('calcWeekly').textContent=rp(weekly)}
+async function submitDropForm(){try{const payload={dropDate:document.getElementById('dropDate').value,customerName:document.getElementById('customerName').value,phone:document.getElementById('customerPhone').value,principal:Number(document.getElementById('principal').value||0)};const r=await server('submitDrop',TOKEN,payload);document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';document.getElementById('principal').value='';updateDropCalc();toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}
+function renderPaymentLoans(){const sel=document.getElementById('paymentLoan');sel.innerHTML=`<option value="">-- Pilih nasabah --</option>`+STATE.activeLoans.map(l=>`<option value="${escAttr(l.dropId)}">${esc(l.customerName)} — saldo ${rp(l.balance)} — ${esc(l.collectionStatus)}</option>`).join('');fillPaymentInfo()}
+function fillPaymentInfo(){const id=document.getElementById('paymentLoan').value,l=STATE&&STATE.activeLoans.find(x=>x.dropId===id);if(!l){document.getElementById('paymentInfo').innerHTML='';document.getElementById('paymentAmount').value='';return}document.getElementById('paymentInfo').innerHTML=`<div><small>Minggu / Jatuh Tempo</small><b>${l.nextWeek||'-'} / ${l.nextDueDate?fmtDate(l.nextDueDate):'-'}</b></div><div><small>Sisa Minggu Ini</small><b>${rp(l.weekRemaining)}</b></div><div><small>Status</small><b>${esc(l.blacklisted?'BLACKLIST':l.collectionStatus)}${l.daysLate?` • ${l.daysLate} hari`:''}</b></div>`;document.getElementById('paymentAmount').value=Math.min(l.weekRemaining,l.balance)}
+async function submitPaymentForm(){try{const payload={dropId:document.getElementById('paymentLoan').value,paymentDate:document.getElementById('paymentDate').value,amount:Number(document.getElementById('paymentAmount').value||0)};const r=await server('submitPayment',TOKEN,payload);toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}
+function renderReport(){const rows=STATE.report.map(r=>`<tr><td>${fmtDate(r.dropDate)}</td><td>${esc(r.customerName)}</td><td>${esc(r.phone||'-')}</td><td>${rp(r.principal)}</td><td>${rp(r.interest)}</td><td>${rp(r.total)}</td><td>6 MINGGU</td><td>${r.nextDueDate?fmtDate(r.nextDueDate):'-'}</td>${r.weeks.map(v=>`<td>${rp(v)}</td>`).join('')}<td>${rp(r.paid)}</td><td>${rp(r.balance)}</td><td>${esc(r.status)}</td><td>${r.daysLate||0}</td><td>${riskBadge(r.collectionStatus,false)}</td><td>${r.blacklisted?'<span class="status s-blacklist">YA</span>':'TIDAK'}</td>
+
+${STATE.session.role === 'ADMIN'
+  ? `<td>
+       <button
+         class="btn-danger"
+         onclick="voidLoan(
+           '${escAttr(r.dropId)}',
+           '${escAttr(r.customerName)}'
+         )">
+         Batalkan
+       </button>
+     </td>`
+  : ''
+}</tr>`).join('');document.getElementById('reportTable').innerHTML=STATE.report.length?`<table><thead><tr><th>TGL DROP</th><th>NAMA NASABAH</th><th>NO HP</th><th>P. POKOK</th><th>BUNGA 20%</th><th>SALDO AWAL</th><th>CICILAN</th><th>JT BERIKUTNYA</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>A. MASUK</th><th>SALDO AKHIR</th><th>STATUS BAYAR</th><th>HARI TERLAMBAT</th><th>STATUS KOLEKTIBILITAS</th><th>BLACKLIST</th>${STATE.session.role === 'ADMIN'
+  ? '<th>AKSI ADMIN</th>'
+  : ''
+}</tr></thead><tbody>${rows}</tbody></table>`:`<div class="empty">Belum ada data yang di-ACC.</div>`}
+function renderRisk(){const s=STATE.settings;document.getElementById('riskRule').innerHTML=`Aturan otomatis: <b>TERLAMBAT</b> jika angsuran melewati jatuh tempo. <b>MACET</b> jika keterlambatan mencapai ${s.badDebtDays} hari atau ${s.badDebtInstallments} angsuran jatuh tempo belum terpenuhi. <b>BLACKLIST</b> ditetapkan/dilepas hanya oleh Admin dan memblokir drop baru.`;const r=STATE.riskLoans||[];document.getElementById('riskTable').innerHTML=r.length?`<div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Nasabah</th><th>Saldo</th><th>JT Berikutnya</th><th>Terlambat</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`+r.map(x=>`<tr><td>${esc(x.customerName)}<br><span class="small muted">${esc(x.phone||'-')}</span></td><td>${rp(x.balance)}</td><td>${x.nextDueDate?fmtDate(x.nextDueDate):'-'}</td><td>${x.daysLate||0} hari<br><span class="small muted">${x.overdueInstallments||0} angsuran</span></td><td>${riskBadge(x.collectionStatus,x.blacklisted)}</td><td>${x.blacklisted?'<span class="small muted">Sudah blacklist</span>':`<button class="btn-danger" onclick="blacklistLoan('${escAttr(x.dropId)}','${escAttr(x.customerName)}')">Blacklist</button>`}</td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty">Tidak ada nasabah terlambat, macet, atau blacklist.</div>`;const b=STATE.blacklist||[];document.getElementById('blacklistTable').innerHTML=b.length?b.map(x=>`<div style="border-bottom:1px solid #e2e8f0;padding:12px 0"><b>${esc(x.customerName)}</b> <span class="status s-blacklist">BLACKLIST</span><br><span class="small muted">${esc(x.phone||'-')} • ${esc(x.createdAt||'')} • oleh ${esc(x.createdBy||'-')}</span><div style="margin:7px 0">${esc(x.reason||'-')}</div><button class="btn-success" onclick="releaseBL('${escAttr(x.blacklistId)}','${escAttr(x.customerName)}')">Lepas Blacklist</button></div>`).join(''):`<div class="empty">Blacklist kosong.</div>`}
+async function blacklistLoan(dropId,name){const reason=prompt(`Alasan memasukkan ${name} ke blacklist:`,`Macet / keputusan Admin`);if(reason===null)return;try{const r=await server('blacklistCustomer',TOKEN,dropId,reason);toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}
+async function releaseBL(id,name){if(!confirm(`Lepas ${name} dari blacklist?`))return;try{const r=await server('releaseBlacklist',TOKEN,id);toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}
+function renderApprovals(){const d=STATE.pendingDrops||[],p=STATE.pendingPayments||[];document.getElementById('pendingDrops').innerHTML=d.length?d.map(x=>`<div style="border-bottom:1px solid #e2e8f0;padding:12px 0"><b>${esc(x.customerName)}</b><br><span class="small muted">${esc(x.phone||'-')} • ${fmtDate(x.dropDate)} • oleh ${esc(x.createdBy)}</span><div style="margin:7px 0">Pokok ${rp(x.principal)} → Total ${rp(x.total)}</div><div class="actions"><button class="btn-success" onclick="approveDrop('${escAttr(x.dropId)}')">ACC & Kunci</button><button class="btn-danger" onclick="rejectDrop('${escAttr(x.dropId)}')">Tolak</button></div></div>`).join(''):`<div class="empty">Tidak ada drop menunggu ACC.</div>`;document.getElementById('pendingPayments').innerHTML=p.length?p.map(x=>`<div style="border-bottom:1px solid #e2e8f0;padding:12px 0"><b>${esc(x.customerName)}</b><br><span class="small muted">Minggu ${x.weekNo} • ${fmtDate(x.paymentDate)} • oleh ${esc(x.createdBy)}</span><div style="margin:7px 0"><b>${rp(x.amount)}</b></div><div class="actions"><button class="btn-success" onclick="approvePayment('${escAttr(x.paymentId)}')">ACC & Kunci</button><button class="btn-danger" onclick="rejectPayment('${escAttr(x.paymentId)}')">Tolak</button></div></div>`).join(''):`<div class="empty">Tidak ada angsuran menunggu ACC.</div>`}
+async function approveDrop(id){try{const r=await server('approveDrop',TOKEN,id);toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}async function approvePayment(id){try{const r=await server('approvePayment',TOKEN,id);toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}async function rejectDrop(id){const reason=prompt('Alasan penolakan:','Data perlu diperbaiki');if(reason===null)return;try{const r=await server('rejectDrop',TOKEN,id,reason);toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}async function rejectPayment(id){const reason=prompt('Alasan penolakan:','Data perlu diperbaiki');if(reason===null)return;try{const r=await server('rejectPayment',TOKEN,id,reason);toast(r.message);await refreshState(true)}catch(e){toast(e.message,true)}}
+async function voidLoan(dropId, customerName) {
+
+  const reason = prompt(
+    'Alasan membatalkan data ' + customerName + ':'
+  );
+
+  if (reason === null) return;
+
+  if (!reason.trim()) {
+    toast('Alasan pembatalan wajib diisi.', true);
+    return;
+  }
+
+  const yakin = confirm(
+    'Yakin membatalkan data ' +
+    customerName +
+    '?\n\n' +
+    'Drop dan angsuran terkait akan dikeluarkan dari laporan.'
+  );
+
+  if (!yakin) return;
+
+  try {
+
+    const r = await server(
+      'voidLoanAdmin',
+      TOKEN,
+      dropId,
+      reason
+    );
+
+    toast(r.message);
+
+    await refreshState(true);
+
+  } catch (e) {
+
+    toast(e.message, true);
+
+  }
+}
+function renderUsers(){const u=STATE.users||[];document.getElementById('usersTable').innerHTML=u.length?`<div class="table-wrap"><table style="min-width:600px"><thead><tr><th>Nama</th><th>Username</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`+u.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.username)}</td><td>${esc(x.role)}</td><td>${x.active?'Aktif':'Nonaktif'}</td><td><button class="btn-muted" onclick="toggleUser('${escAttr(x.userId)}',${!x.active})">${x.active?'Nonaktifkan':'Aktifkan'}</button> <button class="btn-muted" onclick="resetPass('${escAttr(x.userId)}')">Reset Password</button></td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty">Belum ada akun.</div>`}
+async function addUser(){try{const payload={name:v('newUserName'),username:v('newUsername'),password:v('newUserPassword'),role:v('newUserRole')};const r=await server('addUser',TOKEN,payload);toast(r.message);['newUserName','newUsername','newUserPassword'].forEach(id=>document.getElementById(id).value='');await refreshState(true)}catch(e){toast(e.message,true)}}async function toggleUser(id,active){try{await server('setUserActive',TOKEN,id,active);toast('Status akun diperbarui');await refreshState(true)}catch(e){toast(e.message,true)}}async function resetPass(id){const p=prompt('Password baru minimal 8 karakter:');if(!p)return;try{await server('resetUserPassword',TOKEN,id,p);toast('Password berhasil direset')}catch(e){toast(e.message,true)}}
+function renderAudit(){const a=STATE.audit||[];document.getElementById('auditTable').innerHTML=a.length?`<div class="table-wrap"><table><thead><tr><th>Waktu</th><th>User</th><th>Role</th><th>Aksi</th><th>Entitas</th><th>Detail</th></tr></thead><tbody>`+a.map(x=>`<tr><td>${esc(x.createdAt)}</td><td>${esc(x.username)}</td><td>${esc(x.role)}</td><td>${esc(x.action)}</td><td>${esc(x.entity)}<br><span class="small muted">${esc(x.entityId)}</span></td><td>${esc(x.details)}</td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty">Belum ada log.</div>`}
+async function exportExcel(){try{toast('Menyiapkan Excel...');const r=await server('exportApprovedReportXlsx',TOKEN);const bytes=atob(r.base64),arr=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)arr[i]=bytes.charCodeAt(i);const blob=new Blob([arr],{type:r.mimeType}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=r.fileName;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Excel berhasil dibuat')}catch(e){toast(e.message,true)}}
+function showPage(name,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');document.querySelectorAll('.nav button[data-page]').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');const titles={dashboard:'Dashboard',drop:'Drop Baru',payment:'Input Angsuran',report:'Laporan',risk:'Risiko & Blacklist',approval:'Menunggu ACC',users:'Karyawan',audit:'Audit Log',password:'Ubah Password'};document.getElementById('pageTitle').textContent=titles[name]||name}
+function riskBadge(status,blacklisted){if(blacklisted)return `<span class="status s-blacklist">BLACKLIST</span>`;const cls=status==='MACET'?'s-macet':status==='TERLAMBAT'?'s-terlambat':status==='LUNAS'?'s-lunas':'s-lancar';return `<span class="status ${cls}">${esc(status||'LANCAR')}</span>`}
+function rp(n){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n||0))}function fmtDate(s){if(!s)return '-';const p=String(s).split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:s}function v(id){return document.getElementById(id).value}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function escAttr(s){return esc(s).replace(/`/g,'&#96;')}function toast(msg,error=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(error?' error':'');setTimeout(()=>t.classList.add('hidden'),3200)}
+</script>
+</body>
+</html>
